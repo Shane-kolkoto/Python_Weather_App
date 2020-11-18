@@ -1,28 +1,27 @@
-def weather():
-    # create OWM object
-    API_key = '3ca51794f7789141f0525a05d80a43b9'
-    owm = OWM(API_key)
+import requests
+from pprint import pprint
 
-    theCity = "Seattle"
-    theState = "WA"
-    weatherCityState = theCity + ", " + theState
-    weatherLocation = theCity + ",US"
 
-    # get currently observed weather for Seattle, WA, US
-    obs = owm.weather_at_place(weatherLocation)
+city = input("Please enter city")
+url = 'https://api.openweathermap.org/data/2.5/weather?q={}&appid=ad1afec188a74ee6ddf2c04804728b4f&units=metric'.format(city)
 
-    # get weather object for current Seattle weather
-    w = obs.get_weather()
+res = requests.get(url)
 
-    # get current weather status and temperature in fahrenheit
-    currStatus = w.get_detailed_status()
-    tempF = w.get_temperature('fahrenheit')["temp"]
+data = res.json()
 
-    # query the daily forcast for Seattle, WA, US, for the next 5 days
-    fc = owm.daily_forecast('Seattle,US', limit=5)
+#Tempreture
+temp = data['main']['temp']
+temp_min = data['main']['temp_min']
+temp_max = data['main']['temp_max']
+humidity = data['main']['humidity']
 
-    # get a forcaster object
-    f = fc.get_forecast()
+#Wind speed
+wind_speed = data['wind']['speed']
 
-    return render_template('templateWeather.html', theLocation=weatherCityState, currStatus=currStatus, theTemp=tempF, forecast=f,
-                           title="Weather", arrow=arrow)
+#Clouds
+clouds = data['clouds']['all']
+
+
+print(temp)
+print(temp_min)
+print(temp_max)
