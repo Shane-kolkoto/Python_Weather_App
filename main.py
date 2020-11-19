@@ -1,84 +1,69 @@
 import tkinter
 from tkinter import *
+from tkinter import messagebox
 import requests
+from configparser import ConfigParser
 
-Weather = Tk()
-Weather.title("Weather App")
+url = 'https://api.openweathermap.org/data/2.5/weather?q={}&appid=ad1afec188a74ee6ddf2c04804728b4f'
 
-#Welcome Frame
-welcome = Frame(Weather)
-welcome.pack(side=TOP)
-wel_label = Label(welcome, text="Weather App", font="ariel")
-wel_label.pack(side=LEFT)
-
-#City and button
-frame = Frame(Weather)
-frame.pack(side=TOP)
-city = Label(frame, text="Please enter city: ")
-city.pack(side=LEFT)
-city_entry = Entry(frame)
-city_entry.pack(side=LEFT)
-search = Button(frame, text="search", bd=2)
-search.pack(side=LEFT)
-
-#Displaying info frames
-#Temp frame
-frame1 = Frame(Weather)
-frame1.pack(side=TOP)
-temp = Label(frame1, text="tempreture: ")
-temp.pack(side=LEFT)
-temp_entry = Entry(frame1, bd=2)
-temp_entry.pack(side=LEFT)
-
-#Temp Max
-frame2 = Frame(Weather)
-frame2.pack(side=TOP)
-temp_max = Label(frame2, text="Temp (Max): ")
-temp_max.pack(side=LEFT)
-max_entry = Entry(frame2, bd=2)
-max_entry.pack(side=LEFT)
+def get_weather(city):
+    reslts = requests.get(url.format(city, url))
+    if reslts:
+        json = reslts.json()
+        city = json['name']
+        country = json['sys']['country']
+        temp_kelvin = json['main']['temp']
+        temp_cel = temp_kelvin - 273.15
+        temp_fah = (temp_kelvin-273.15) * 9 / 5 + 32
+        icon = json['weather'][0]['icon']
+        weather = json['weather'][0]['main']
+        final = (city, country, temp_cel, temp_fah, icon, weather)
+        return final
+    else:
+        return None
 
 
-#Temp Min
-frame3 = Frame(Weather)
-frame3.pack(side=TOP)
-temp_min = Label(frame3, text="Temp (Min): ")
-temp_min.pack(side=LEFT)
-min_entry = Entry(frame3, bd=2)
-min_entry.pack(side=LEFT)
+def search():
+    city = city_text.get()
+    weather = get_weather(city)
+    if weather:
+        Location['text'] = '{}, {}'.format(weather[0], weather[1])
+        images['bitmap'] = 'Weather_icons/{}.png'.format(weather[4])
+        Temp['text'] = '{:.2f}°C {:2f}°F'.format(weather[2], weather[3])
+        weather['text'] = weather[5]
+    else:
+        messagebox.showerror('Error!', 'Place not found!')
 
 
-#Humidity
-frame4 = Frame(Weather)
-frame4.pack(side=TOP)
-humidity = Label(frame4, text="Humidity: ")
-humidity.pack(side=LEFT)
-humidity_entry = Entry(frame4, bd=2)
-humidity_entry.pack(side=LEFT)
+Win = Tk()
+Win.title("Weather App")
 
+city_text = StringVar()
+city_entry = Entry(Win, textvariable=city_text)
+city_entry.pack()
 
-#Wind speed
-frame5 = Frame(Weather)
-frame5.pack(side=TOP)
-speed = Label(frame5, text="Wind Speed: ")
-speed.pack(side=LEFT)
-speed_entry = Entry(frame5, bd=2)
-speed_entry.pack(side=LEFT)
+city_lbl = Label(Win, text="Please enter city")
+city_lbl.pack()
 
+#buttom
+search = Button(Win, text="search", width=12, command=search)
+search.pack()
 
-#Clouds
-frame6 = Frame(Weather)
-frame6.pack(side=TOP)
-clouds = Label(frame6, text="Clouds: ")
-clouds.pack(side=LEFT)
-clouds_entry = Entry(frame6, bd=2)
-clouds_entry.pack(side=LEFT)
+#Location name
+Location = Label(Win, text="Location", font=('bold', 20))
+Location.pack()
 
+#images
+images = Label(Win, bitmap='')
+images.pack()
 
+#Temp
+Temp = Label(Win, text="Temp")
+Temp.pack()
 
+#Weather
+Weather = Label(Win, text="Weather")
+Weather.pack()
 
-
-
-Weather.geometry('500x500')
-Weather.config(bg="light blue")
-Weather.mainloop()
+Win.geometry('700x350')
+Win.mainloop()

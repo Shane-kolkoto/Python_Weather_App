@@ -4,9 +4,7 @@ from pprint import pprint
 
 city = input("Please enter city")
 url = 'https://api.openweathermap.org/data/2.5/weather?q={}&appid=ad1afec188a74ee6ddf2c04804728b4f&units=metric'.format(city)
-
 res = requests.get(url)
-
 data = res.json()
 
 #Tempreture
@@ -25,3 +23,7 @@ clouds = data['clouds']['all']
 print(temp)
 print(temp_min)
 print(temp_max)
+print(humidity)
+print(wind_speed)
+print(clouds)
+
